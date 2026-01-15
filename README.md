@@ -1,157 +1,218 @@
-# @raptrx/askai
+# askai
 
-> One package. Any AI. One click.
+> Add "Ask AI" buttons to your app in seconds. No dependencies. You own the code.
 
-Generate deep-link URLs for ChatGPT, Claude, Gemini, Grok, Perplexity, and more. Works with vanilla JS, Node.js, and React.
-
-## Install
-
-```bash
-npm install @raptrx/askai
-```
+Send content to ChatGPT, Claude, Gemini, Grok, Perplexity and 5 more AI services with one click.
 
 ## Quick Start
 
-### Vanilla JS / Node.js
-
-```typescript
-import { createAiPrompt, createAiPrompts, openAiPrompt } from '@raptrx/askai';
-
-// Single service
-const url = createAiPrompt('Explain this code', 'const x = 1;', 'chatgpt');
-
-// Multiple services
-const urls = createAiPrompts('Summarize', text, ['chatgpt', 'claude', 'gemini']);
-
-// Open directly
-openAiPrompt('Review this', code, 'claude');
+```bash
+npx @raptrx/askai init
 ```
 
-### React
+```bash
+npx @raptrx/askai add button
+```
+
+That's it. You now have an AI button in your project.
+
+## How It Works
+
+This is **NOT** a dependency. Like [shadcn/ui](https://ui.shadcn.com), we copy the code directly into your project:
+
+```
+your-project/
+├── askai.json                    # Config
+├── src/
+│   ├── lib/askai.ts             # AI services (you own this)
+│   └── components/askai/
+│       └── ask-ai-button.tsx    # Components (you own this)
+```
+
+**You own the code.** Customize it however you want.
+
+## Usage
+
+### Button
 
 ```tsx
-import { AiButton, AiButtonBar } from '@raptrx/askai/react';
+import { AskAIButton } from '@/components/askai/ask-ai-button';
 
-// Single button
-<AiButton goal="Explain" content={code} service="chatgpt" />
-
-// Button bar with multiple services
-<AiButtonBar
-  goal="Review this code"
-  content={code}
-  services={['chatgpt', 'claude', 'gemini']}
-  theme="brand"
+<AskAIButton
+  service="chatgpt"
+  goal="Explain this code"
+  content={codeString}
 />
 ```
 
-## Supported Services
-
-| Service    | ID           |
-|------------|--------------|
-| ChatGPT    | `chatgpt`    |
-| Claude     | `claude`     |
-| Gemini     | `gemini`     |
-| Grok       | `grok`       |
-| Perplexity | `perplexity` |
-| DeepSeek   | `deepseek`   |
-| Mistral    | `mistral`    |
-| Copilot    | `copilot`    |
-| Kagi       | `kagi`       |
-| Google AI  | `google`     |
-
-## API
-
-### `createAiPrompt(goal, content, service, options?)`
-
-Create a URL for one AI service.
-
-```typescript
-const url = createAiPrompt('Explain this', code, 'chatgpt');
-window.open(url, '_blank');
-```
-
-### `createAiPrompts(goal, content, services, options?)`
-
-Create URLs for multiple services.
-
-```typescript
-const results = createAiPrompts('Summarize', text, ['chatgpt', 'claude']);
-// Returns: [{ service, url, name, color }, ...]
-```
-
-### `openAiPrompt(goal, content, service, options?)`
-
-Open AI prompt directly in new tab.
-
-```typescript
-openAiPrompt('Analyze', data, 'perplexity');
-```
-
-### `suggestService(content)`
-
-Auto-detect best service for content.
-
-```typescript
-suggestService('const x = 1;');  // 'claude' (code)
-suggestService('What is 2+2?'); // 'perplexity' (question)
-```
-
-### `addService(id, config)`
-
-Add custom AI service.
-
-```typescript
-import { addService } from '@raptrx/askai';
-
-addService('myai', {
-  name: 'My AI',
-  baseUrl: 'https://myai.com/chat',
-  promptParam: 'q',
-  color: '#ff0000',
-});
-```
-
-## React Components
-
-### `<AiButton />`
+### Link (SSR-friendly)
 
 ```tsx
-<AiButton
-  goal="Explain"           // What to ask
-  content={text}           // Content to send
-  service="chatgpt"        // Service ID
-  theme="brand"            // 'light' | 'dark' | 'brand'
-  showIcon={true}          // Show service icon
-  label="Ask GPT"          // Custom label
-  onClick={(url) => {}}    // Click callback
+import { AskAILink } from '@/components/askai/ask-ai-link';
+
+<AskAILink
+  service="claude"
+  goal="Review this"
+  content={codeString}
+>
+  Ask Claude
+</AskAILink>
+```
+
+### Dropdown (multiple services)
+
+```tsx
+import { AskAIDropdown } from '@/components/askai/ask-ai-dropdown';
+
+<AskAIDropdown
+  goal="Explain this code"
+  content={codeString}
+  services={['chatgpt', 'claude', 'gemini', 'perplexity']}
 />
 ```
 
-### `<AiButtonBar />`
+### Direct URL (vanilla JS)
 
-```tsx
-<AiButtonBar
-  goal="Review"
-  content={code}
-  services={['chatgpt', 'claude']}  // Or 'all'
-  theme="brand"
-  direction="row"           // 'row' | 'column'
-  gap={8}
-  maxServices={3}
-/>
+```ts
+import { buildPromptUrl, openInAI } from '@/lib/askai';
+
+// Get URL
+const url = buildPromptUrl('chatgpt', 'Explain this', code);
+
+// Or open directly
+openInAI('claude', 'Review this', code);
 ```
 
-## Content Formats
+## CLI Commands
 
-```typescript
-// Plain text
-createAiPrompt('Explain', 'Hello world', 'chatgpt');
+```bash
+# Initialize in your project
+npx @raptrx/askai init
 
-// Code with language
-createAiPrompt('Review', { text: code, language: 'typescript' }, 'claude');
+# Add components
+npx @raptrx/askai add button      # AskAIButton
+npx @raptrx/askai add link        # AskAILink
+npx @raptrx/askai add dropdown    # AskAIDropdown
 
-// Auto-detects code and wraps in code blocks
-createAiPrompt('Explain', 'function test() {}', 'chatgpt');
+# Help
+npx @raptrx/askai --help
+```
+
+## Supported AI Services
+
+| Service | ID | URL |
+|---------|-------|-----|
+| ChatGPT | `chatgpt` | chat.openai.com |
+| Claude | `claude` | claude.ai |
+| Gemini | `gemini` | gemini.google.com |
+| Grok | `grok` | grok.x.ai |
+| Perplexity | `perplexity` | perplexity.ai |
+| DeepSeek | `deepseek` | chat.deepseek.com |
+| Mistral | `mistral` | chat.mistral.ai |
+| Copilot | `copilot` | copilot.microsoft.com |
+| Kagi | `kagi` | kagi.com |
+| Google AI Studio | `google` | aistudio.google.com |
+
+## Configuration
+
+After running `init`, you'll have an `askai.json`:
+
+```json
+{
+  "typescript": true,
+  "srcDir": "src",
+  "utilsPath": "./src/lib/askai",
+  "componentsPath": "./src/components/askai"
+}
+```
+
+## Customization
+
+Since you own the code, you can:
+
+- Add your own AI services
+- Change the button styles
+- Modify the URL building logic
+- Add analytics/tracking
+- Integrate with your design system
+
+Example - add a new AI service:
+
+```ts
+// In src/lib/askai.ts
+export const services = {
+  // ... existing services
+  myai: {
+    name: 'My AI',
+    url: 'https://myai.com',
+    buildUrl: (prompt) => `https://myai.com/chat?q=${encodeURIComponent(prompt)}`,
+  },
+};
+```
+
+## Why askai?
+
+- **Zero runtime dependencies** - Code is copied to your project
+- **Full control** - Customize everything
+- **Type-safe** - Full TypeScript support
+- **10 AI services** - ChatGPT, Claude, Gemini, and more
+- **Framework agnostic** - Works with React, Next.js, Remix, etc.
+
+## Examples
+
+### Code Explainer
+
+```tsx
+function CodeBlock({ code, language }) {
+  return (
+    <div>
+      <pre>{code}</pre>
+      <AskAIDropdown
+        goal={`Explain this ${language} code`}
+        content={code}
+        services={['chatgpt', 'claude']}
+      />
+    </div>
+  );
+}
+```
+
+### Documentation Helper
+
+```tsx
+function DocPage({ content }) {
+  return (
+    <article>
+      {content}
+      <AskAIButton
+        service="perplexity"
+        goal="Find more information about"
+        content={content}
+      >
+        Research More
+      </AskAIButton>
+    </article>
+  );
+}
+```
+
+### Error Assistant
+
+```tsx
+function ErrorBoundary({ error }) {
+  return (
+    <div>
+      <p>Something went wrong</p>
+      <AskAIButton
+        service="chatgpt"
+        goal="Help me fix this error"
+        content={error.stack}
+      >
+        Ask AI for Help
+      </AskAIButton>
+    </div>
+  );
+}
 ```
 
 ## License
