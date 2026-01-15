@@ -24,12 +24,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "npx rollup -c",
     "dev": "rollup -c -w",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build"
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "prompts": "^2.4.2",
