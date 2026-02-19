@@ -41,8 +41,30 @@ async function init(): Promise<void> {
   console.log(LOGO);
 
   // Detect environment
-  const hasSrc = fs.existsSync(path.join(process.cwd(), 'src'));
-  const hasApp = fs.existsSync(path.join(process.cwd(), 'app'));
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  let framework = 'React';
+  let hasSrc = fs.existsSync(path.join(process.cwd(), 'src'));
+  let hasApp = fs.existsSync(path.join(process.cwd(), 'app'));
+
+  if (fs.existsSync(packageJsonPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+      if (deps['next']) {
+        framework = 'Next.js';
+        hasApp = fs.existsSync(path.join(process.cwd(), 'app')) || fs.existsSync(path.join(process.cwd(), 'src/app'));
+      } else if (deps['vite']) {
+        framework = 'Vite';
+      } else if (deps['@remix-run/react']) {
+        framework = 'Remix';
+      }
+    } catch (e) {
+      // Ignore parse errors
+    }
+  }
+
+  console.log(pc.dim(`  Detecting environment: ${pc.cyan(framework)} found.`));
+  console.log();
 
   const response = await prompts([
     {
@@ -62,11 +84,9 @@ async function init(): Promise<void> {
       type: 'text',
       name: 'componentsPath',
       message: 'Where should we create the Ask AI components?',
-      initial: hasSrc
-        ? './src/components/ask-ai'
-        : hasApp
-          ? './components/ask-ai'
-          : './components/ask-ai',
+      initial: framework === 'Next.js'
+        ? (hasApp ? './app/components/ask-ai' : './components/ask-ai')
+        : (hasSrc ? './src/components/ask-ai' : './components/ask-ai'),
     },
   ]);
 
@@ -76,9 +96,9 @@ async function init(): Promise<void> {
   }
 
   const outDir = path.resolve(process.cwd(), response.componentsPath);
-  ensureDir(path.join(outDir, 'core.ts'));
+  ensureDir(path.join(outDir, 'core.tsx'));
 
-  const corePath = path.join(outDir, 'core.ts');
+  const corePath = path.join(outDir, 'core.tsx');
   const buttonPath = path.join(outDir, 'AskAiButton.tsx');
   const buttonBarPath = path.join(outDir, 'AskAiButtonBar.tsx');
 
@@ -128,6 +148,16 @@ async function init(): Promise<void> {
   console.log();
   console.log(pc.yellow('  Open for new opportunities: ') + pc.underline('https://aliarain.com'));
   console.log(pc.dim('  Support and contributions are welcome!\\n'));
+
+  // Write config
+  const config = {
+    goal: response.goal,
+    services: response.services,
+    path: response.componentsPath,
+    framework,
+    version: '1.2.0'
+  };
+  fs.writeFileSync(path.join(process.cwd(), '.askaiconfig.json'), JSON.stringify(config, null, 2));
 }
 
 function showHelp(): void {
@@ -164,7 +194,7 @@ async function main(): Promise<void> {
       break;
     case '-v':
     case '--version':
-      console.log('1.1.0');
+      console.log('1.2.0');
       break;
     default:
       console.log(pc.red('✗'), 'Unknown command:', pc.yellow(command));
