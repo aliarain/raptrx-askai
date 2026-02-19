@@ -5,7 +5,7 @@ import path from 'path';
 import { coreTemplate, buttonTemplate, buttonBarTemplate } from './templates';
 
 const LOGO = `
-  ${pc.bold(pc.cyan('askai'))} ${pc.dim('v1.0')}
+  ${pc.bold(pc.cyan('askai'))} ${pc.dim('v1.4')}
   ${pc.dim('Add AI buttons to your app')}
 `;
 
@@ -194,7 +194,7 @@ async function main(): Promise<void> {
       break;
     case '-v':
     case '--version':
-      console.log('1.2.0');
+      console.log('1.4.0');
       break;
     default:
       console.log(pc.red('✗'), 'Unknown command:', pc.yellow(command));
