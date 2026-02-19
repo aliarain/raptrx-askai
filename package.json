@@ -1,6 +1,6 @@
 {
   "name": "@raptrx/askai",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Simplified AI prompt deep-linking for ChatGPT, Claude, Gemini, Grok, Perplexity and more",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -13,11 +13,6 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./react": {
-      "import": "./dist/react.mjs",
-      "require": "./dist/react.js",
-      "types": "./dist/react.d.ts"
     }
   },
   "files": [
@@ -31,27 +26,19 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "prompts": "^2.4.2",
-    "picocolors": "^1.0.0"
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    }
+    "picocolors": "^1.0.0",
+    "prompts": "^2.4.2"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "^20.10.0",
     "@types/prompts": "^2.4.9",
     "@types/react": "^18.2.0",
     "eslint": "^8.55.0",
-    "rollup": "^4.9.0",
-    "rollup-plugin-dts": "^6.1.0",
-    "@rollup/plugin-typescript": "^11.1.5",
-    "tslib": "^2.6.2",
-    "typescript": "^5.3.0",
+    "rollup": "^4.57.1",
+    "rollup-plugin-dts": "^6.3.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
     "vitest": "^1.1.0"
   },
   "author": "Ali Arain",
